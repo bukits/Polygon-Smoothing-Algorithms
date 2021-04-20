@@ -337,12 +337,9 @@ std::vector<Patch*> ConstructionGenerator::generateFPatches(const std::vector<XO
 	return f_patches;
 }
 
-std::vector<BezierSurface*> ConstructionGenerator::generateBezierSurfacesFromPatces(SmoothingViewer::ConstructionMode mode) {
-	std::vector<BezierSurface*> surfaces;
+void ConstructionGenerator::generateBezierSurfacesFromPatces(SmoothingViewer::ConstructionMode mode, size_t resolution, SmoothingViewer::PolyMesh& mesh) {
 	for (auto patch : patches)
-		for (auto surface : patch->setUpBezierSurface(mode))
-			surfaces.push_back(surface);
-	return surfaces;
+		patch->setUpBezierSurface(mode, resolution, mesh);
 }
 
 std::vector<BezierCurve*> ConstructionGenerator::generateBoundingCurves(SmoothingViewer::ConstructionMode mode) {

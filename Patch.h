@@ -9,11 +9,15 @@ private:
 	MyViewer::MyTraits::Point central_point;
 	std::vector<MyViewer::MyTraits::Point> twist_points;
 	std::vector<MyViewer::MyTraits::Point> projected_twist_points;
+	std::vector<MyViewer::MyTraits::Point> internal_bezier_points;
 
 	MyViewer::MyTraits::Point projectionToPlane(MyViewer::MyTraits::Point twist, OpenMesh::Vec3f face_normal);
 	OpenMesh::Vec3f calculateBestFaceNormal();
 	void drawLineSplit(std::vector<MyViewer::MyTraits::Point> points, Vec color);
 	void drawWithNamesFace(std::vector<MyViewer::MyTraits::Point> points);
+	MyViewer::MyTraits::Point translatePointBy(float rate, MyViewer::MyTraits::Point p1, MyViewer::MyTraits::Point p2);
+	void caculateInternalBezier(OpenMesh::Vec3f normal);
+	MyViewer::MyTraits::Point bezierToThreeChord(MyViewer::MyTraits::Point q1, MyViewer::MyTraits::Point q2, MyViewer::MyTraits::Point p0);
 protected: 
 	std::vector<XObject*> x_neighbours;
 	std::vector<ThreeChordSegment*> bounding_curves;
@@ -23,7 +27,7 @@ protected:
 	std::vector<MyViewer::MyTraits::Point> internal_points;
 
 	MyViewer::MyTraits::Point findSharedE(XObject* x1, XObject* x2);
-	std::vector<BezierSurface*> build4sidedPatch(SmoothingViewer::ConstructionMode mode);
+	BezierSurface* build4sidedPatch(SmoothingViewer::ConstructionMode mode);
 	std::vector<BezierSurface*> centralSplit(SmoothingViewer::ConstructionMode mode);
 	void attachCurveToX(ThreeChordSegment* curve, XObject* x);
 	ThreeChordSegment* searchCommonCurve(XObject* x1, XObject* x2);
@@ -34,7 +38,7 @@ public:
 	}
 
 	void setNeighbour(XObject* x);
-	virtual std::vector<BezierSurface*> setUpBezierSurface(SmoothingViewer::ConstructionMode mode) = 0;
+	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, MyViewer::PolyMesh& mesh) = 0;
 	virtual std::vector<ThreeChordSegment*> setUpBoundingCurves() = 0;
 	void drawControlNet(bool isBezier, bool isThreeChord) const;
 	void drawOriginalFace();

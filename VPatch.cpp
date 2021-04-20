@@ -1,13 +1,15 @@
 #include "VPatch.h"
 #include "ThreeChordSegment.h"
 
-std::vector<BezierSurface*> VPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode) {
+void VPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, MyViewer::PolyMesh& mesh) {
 	for (auto x : x_neighbours)
 		internal_points.push_back(x->twist);
 	if (x_neighbours.size() == 4) {
-		return build4sidedPatch(mode);
+		auto bezier = build4sidedPatch(mode);
+		bezier->generateSurface(resolution, mesh);
 	} else {
-		return centralSplit(mode);
+		auto beziers = centralSplit(mode);
+		for (auto bezier : beziers) bezier->generateSurface(resolution, mesh);
 	}
 
 }

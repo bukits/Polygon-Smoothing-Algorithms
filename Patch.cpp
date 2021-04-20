@@ -3,7 +3,7 @@
 #include "ThreeChordSegment.h"
 #include "ThreeChordPatch.h"
 
-std::vector<BezierSurface*> Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
+BezierSurface* Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
 	ThreeChordPatch* three_chord_patch = new ThreeChordPatch();
 	for (int i = 0; i < 4; ++i) three_chord_patch->setControlPoint(0, i, bounding_curves.at(0)->getThreeChordCp(i));
 	for (int j = 0; j < 4; ++j) three_chord_patch->setControlPoint(j, 3, bounding_curves.at(1)->getThreeChordCp(j));
@@ -16,8 +16,9 @@ std::vector<BezierSurface*> Patch::build4sidedPatch(SmoothingViewer::Constructio
 	three_chord_patch->setControlPoint(2, 1, internal_points.at(3));
 
 	three_chord_patches.push_back(three_chord_patch);
-	bezier_patches.push_back(three_chord_patch->generatePatch(mode));
-	return bezier_patches;
+	auto bezier = three_chord_patch->generatePatch(mode);
+	bezier_patches.push_back(bezier);
+	return bezier;
 }
 
 MyViewer::MyTraits::Point Patch::projectionToPlane(MyViewer::MyTraits::Point twist, OpenMesh::Vec3f face_normal) {
@@ -61,6 +62,45 @@ ThreeChordSegment* Patch::searchCommonCurve(XObject* x1, XObject* x2) {
 	}
 }
 
+MyViewer::MyTraits::Point Patch::translatePointBy(float rate, MyViewer::MyTraits::Point p1, MyViewer::MyTraits::Point p2) {
+	auto dir = p1 - p2;
+	return rate * dir.length() * dir.normalize();
+}
+
+MyViewer::MyTraits::Point Patch::bezierToThreeChord(MyViewer::MyTraits::Point q1, MyViewer::MyTraits::Point q2, MyViewer::MyTraits::Point p0) {
+	auto half = 0.5 * (q1 + q2);
+	auto p = p0 + translatePointBy(0.75, half, p0);
+	return p;
+}
+
+void Patch::caculateInternalBezier(OpenMesh::Vec3f normal) {
+	for (size_t i = 0; i < x_neighbours.size(); i++) {
+		auto x = x_neighbours.at(i);
+		const auto& t = internal_points.at(i);
+		auto t_after_projection = projectionToPlane(t, normal);
+		ThreeChordSegment* left_curve, * right_curve;
+		XObject* x_next, * x_back;
+		if (i == 0) {
+			x_next = x_neighbours.at(i + 1);
+			x_back = x_neighbours.at(x_neighbours.size() - 1);
+		}
+		else if (i == x_neighbours.size() - 1) {
+			x_next = x_neighbours.at(0);
+			x_back = x_neighbours.at(i - 1);
+		}
+		else {
+			x_next = x_neighbours.at(i + 1);
+			x_back = x_neighbours.at(i - 1);
+		}
+		right_curve = searchCommonCurve(x, x_back);
+		left_curve = searchCommonCurve(x, x_next);
+
+		auto t_bezier = t_after_projection + translatePointBy(1 / 3.0f, t_after_projection, left_curve->getThreeChordCp(1))
+			+ translatePointBy(1 / 3.0f, t_after_projection, right_curve->getThreeChordCp(2));
+		internal_bezier_points.push_back(t_bezier);
+	}
+}
+
 std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMode mode) {
 	MyViewer::MyTraits::Point pointSum;
 	pointSum[0] = pointSum[1] = pointSum[2] = 0.0;
@@ -71,10 +111,10 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 	central_point = pointSum / internal_points.size();
 
 	auto face_normal = calculateBestFaceNormal();
+	caculateInternalBezier(face_normal);
 
 	for (size_t i = 0; i < x_neighbours.size(); i++){
 		auto x = x_neighbours.at(i);
-		auto curves = x->connected_curves;
 		const auto& t = internal_points.at(i);
 		auto t_after_projection = projectionToPlane(t, face_normal);
 		projected_twist_points.push_back(t_after_projection);
@@ -108,6 +148,7 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 		auto w_back = 0.5 * (t_back + t_after_projection);
 		auto w_next_new = 0.5 * (t_new + t_next_new);
 		auto w_back_new = 0.5 * (t_new + t_back_new);
+
 		ThreeChordPatch* three_chord_patch = new ThreeChordPatch();
 		for (int i = 0; i < 4; ++i) three_chord_patch->setControlPoint(i, 0, left_curve->getLeftSegmentPoint(i));
 		for (int j = 0; j < 4; ++j) three_chord_patch->setControlPoint(0, j, right_curve->getRightSegmentPoint(j));
@@ -118,9 +159,25 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 
 		auto p11 = 0.25 * (t_after_projection + left_curve->getThreeChordCp(1) + right_curve->getThreeChordCp(2) + left_curve->getThreeChordCp(0));
 		auto p13 = 0.25 * (t_after_projection + t_back + right_curve->getThreeChordCp(1) + right_curve->getThreeChordCp(2));
-		auto p12 = 0.25 * (t_after_projection + right_curve->getThreeChordCp(2) + w_back + right_curve->getHalfPoint());
 		auto p31 = 0.25 * (t_after_projection + t_next + left_curve->getThreeChordCp(1) + left_curve->getThreeChordCp(2));
-		auto p21 = 0.25 * (t_after_projection + left_curve->getThreeChordCp(1) + w_next + left_curve->getHalfPoint());
+
+		MyViewer::MyTraits::Point p12, p21;
+		if (mode == SmoothingViewer::ConstructionMode::CUBIC) {
+			const auto& t_bezier = internal_bezier_points.at(i);
+			const auto& t_next_bezier = internal_bezier_points.at(next);
+			const auto& t_back_bezier = internal_bezier_points.at(back);
+
+			auto q_i = 0.25 * (left_curve->getBezierCps(0) + left_curve->getBezierCps(1) + right_curve->getBezierCps(2) + t_bezier);
+			auto q_next = 0.25 * (left_curve->getBezierCps(1) + left_curve->getBezierCps(2) + t_next_bezier + t_bezier);
+			auto q_back = 0.25 * (right_curve->getBezierCps(1) + right_curve->getBezierCps(2) + t_back_bezier + t_bezier);
+			p21 = bezierToThreeChord(q_i, q_next, p31);
+			p12 = bezierToThreeChord(q_i, q_back, p13);
+		}
+		if (mode == SmoothingViewer::ConstructionMode::QUADRATIC) {
+			p12 = 0.25 * (t_after_projection + right_curve->getThreeChordCp(2) + w_back + right_curve->getHalfPoint());
+			p21 = 0.25 * (t_after_projection + left_curve->getThreeChordCp(1) + w_next + left_curve->getHalfPoint());
+		}
+
 		three_chord_patch->setControlPoint(1, 1, p11);
 		three_chord_patch->setControlPoint(1, 2, p12);
 		three_chord_patch->setControlPoint(1, 3, p13);

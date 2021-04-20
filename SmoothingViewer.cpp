@@ -211,10 +211,7 @@ void SmoothingViewer::draw() {
 
 void SmoothingViewer::generateSmoothedMesh(ConstructionMode curve_mode, size_t resolution) {
     mesh.clean();
-    auto generated_bezier_surfaces = used_construction->generateBezierSurfacesFromPatces(curve_mode);
-    for (auto bezier : generated_bezier_surfaces) {
-        bezier->generateSurface(resolution, mesh);
-    }
+    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, mesh);   
     show_colored_patches = true;
     this->updateMesh();
     this->update();

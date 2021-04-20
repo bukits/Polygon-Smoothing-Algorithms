@@ -7,6 +7,8 @@ private:
 	MyViewer::MyTraits::Point three_chord_cps[4];
 	MyViewer::MyTraits::Point half_point;
 
+	std::vector< MyViewer::MyTraits::Point> bezier_cps;
+
 	MyViewer::MyTraits::Point left_segment[4];
 	MyViewer::MyTraits::Point right_segment[4];
 public:
@@ -26,6 +28,7 @@ public:
 
 	MyViewer::MyTraits::Point getThreeChordCp(int index);
 	MyViewer::MyTraits::Point getHalfPoint();
+	MyViewer::MyTraits::Point getBezierCps(int index);
 
 	MyViewer::MyTraits::Point getLeftSegmentPoint(int at);
 	MyViewer::MyTraits::Point getRightSegmentPoint(int at);

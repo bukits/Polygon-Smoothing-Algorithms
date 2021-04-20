@@ -10,6 +10,7 @@ BezierCurve* ThreeChordSegment::buildCurve(SmoothingViewer::ConstructionMode cur
 
     B_0 = M_0;
     bezier_curve->addControlPoint(B_0);
+    bezier_cps.push_back(B_0);
    
     left_segment[0] = M_0;
     left_segment[1] = (M_0 + M_1) * 0.5;
@@ -44,8 +45,11 @@ BezierCurve* ThreeChordSegment::buildCurve(SmoothingViewer::ConstructionMode cur
         right_segment[2] = right_segment[3] + translatePointBy(0.75, B_123, right_segment[3]);
 
         bezier_curve->addControlPoint(B_1);
+        bezier_cps.push_back(B_1);
         bezier_curve->addControlPoint(B_2);
+        bezier_cps.push_back(B_2);
         bezier_curve->addControlPoint(B_3);
+        bezier_cps.push_back(B_3);
         return bezier_curve;
     }
  }
@@ -69,4 +73,8 @@ MyViewer::MyTraits::Point ThreeChordSegment::getRightSegmentPoint(int at) {
 
 MyViewer::MyTraits::Point ThreeChordSegment::getHalfPoint() {
     return half_point;
+}
+
+MyViewer::MyTraits::Point ThreeChordSegment::getBezierCps(int index) {
+    return bezier_cps.at(index);
 }

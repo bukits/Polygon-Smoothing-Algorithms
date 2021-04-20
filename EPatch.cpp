@@ -1,13 +1,16 @@
 #include "EPatch.h"
 #include "ThreeChordSegment.h"
 
-std::vector<BezierSurface*> EPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode) {
+void EPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, MyViewer::PolyMesh& mesh) {
 	for (size_t i = 0; i < x_neighbours.size(); i++) {
 		auto x_i = x_neighbours.at(i);
 		auto twist_i = x_i->ePoint_twist_i.find(common_edge)->second;
 		internal_points.push_back(twist_i);
 	}
-	return build4sidedPatch(mode);
+
+	auto bezier = build4sidedPatch(mode);
+	resolution *= 2;
+	bezier->generateSurface(resolution, mesh);
 }
 
 std::vector<ThreeChordSegment*> EPatch::setUpBoundingCurves() {

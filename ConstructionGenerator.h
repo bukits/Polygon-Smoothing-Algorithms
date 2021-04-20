@@ -17,7 +17,7 @@ public:
 
 	std::vector<XObject*> setUpXConstruction(SmoothingViewer::ConstructionMode construction_mode, double alpha);
 
-	std::vector<BezierSurface*> generateBezierSurfacesFromPatces(SmoothingViewer::ConstructionMode mode);
+	void generateBezierSurfacesFromPatces(SmoothingViewer::ConstructionMode mode, size_t resolution, SmoothingViewer::PolyMesh& mesh);
 
 	std::vector<Patch*> generateVPatches(const std::vector<XObject*>& xObjects);
 	std::vector<Patch*> generateEPatches(const std::vector<XObject*>& xObjects);
