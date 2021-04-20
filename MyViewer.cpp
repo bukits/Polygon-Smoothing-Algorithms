@@ -346,8 +346,10 @@ void MyViewer::updateVertexNormals() {
 }
 
 void MyViewer::updateMesh(bool update_mean_range) {
-    if (model_type == ModelType::BEZIER_SURFACE)
-        opened_bezier->generateSurface(20);
+    if (model_type == ModelType::BEZIER_SURFACE) {
+        mesh.clean();
+        opened_bezier->generateSurface(20, mesh);
+    }
   mesh.request_face_normals(); mesh.request_vertex_normals();
   mesh.update_face_normals();
 #ifdef USE_JET_NORMALS
@@ -473,7 +475,7 @@ void MyViewer::draw() {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1, 1);
 
-    if (show_solid || show_wireframe) {
+    if ((show_solid || show_wireframe) && !show_colored_patches) {
         if (visualization == Visualization::PLAIN)
             glColor3d(0.5, 0.5, 0.5);
         else if (visualization == Visualization::ISOPHOTES) {

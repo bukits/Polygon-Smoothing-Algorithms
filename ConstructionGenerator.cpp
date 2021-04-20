@@ -355,7 +355,7 @@ std::vector<BezierCurve*> ConstructionGenerator::generateBoundingCurves(Smoothin
 			it = find(half_points.begin(), half_points.end(), half);
 			if (it == half_points.end()) {
 				half_points.push_back(half);
-				curves.push_back(curve_segment->generateCurve(mode));
+				curves.push_back(curve_segment->buildCurve(mode));
 			}
 		}
 	}

@@ -65,8 +65,8 @@ protected:
   PolyMesh mesh;
 
   enum class ModelType { NONE, MESH, BEZIER_SURFACE } model_type;
-
   bool show_colored_patches;
+
 private:
   using TriMesh = OpenMesh::TriMesh_ArrayKernelT<MyTraits>;
 

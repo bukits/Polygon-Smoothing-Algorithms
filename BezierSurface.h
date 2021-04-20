@@ -13,7 +13,7 @@ public:
 		degree[1] = m;
 	}
 
-	void generateSurface(size_t resolution);	
+	void generateSurface(size_t resolution, MyViewer::PolyMesh& mesh);	
 	size_t* getDegree();
 	void colorSurface(Vec color);
 	void colorSurfaceNames();

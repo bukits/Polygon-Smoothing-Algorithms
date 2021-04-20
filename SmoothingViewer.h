@@ -31,6 +31,8 @@ public:
 	void showBestFace();
 	void showControlWireFrame();
 	void showOffsetLines();
+	void showColoredPatches();
+	void showSmoothedMesh();
 
 	bool getBaryCState();
 	bool getEdgesState();
@@ -46,6 +48,7 @@ public:
 	bool getBestFaceState();
 	bool getControlWireFrameState();
 	bool getOffsetLinesState();
+	bool getColoredPatchesState();
 
 	bool openMesh(const std::string& filename, bool update_view = true) override;
 	void setUpConstruction(ConstructionMode construction_mode, ConstructionMode curve_mode, double alpha = 0.1);
@@ -83,7 +86,8 @@ private:
 		show_original_face,
 		show_best_face,
 		show_control_wireframe,
-		show_offset_lines;
+		show_offset_lines,
+		show_smoothed_mesh;
 
 	void drawBoundingNet() const;
 	void generateBoundigNet(ConstructionMode curve_mode, size_t resolution = resolution_curve);

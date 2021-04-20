@@ -17,24 +17,12 @@ public:
 		MyViewer::MyTraits::Point p4) {
 		three_chord_cps[0] = p1; three_chord_cps[1] = p2; three_chord_cps[2] = p3; three_chord_cps[3] = p4;
 
-		if (/*quadratic*/ true) {
-			half_point = 0.5 * (three_chord_cps[1] + three_chord_cps[2]);
-		}
-		else if (/*cubic*/ false) {
-		}
-
-		left_segment[0] = three_chord_cps[0];
-		left_segment[1] = (three_chord_cps[0] + three_chord_cps[1]) * 0.5;
-		left_segment[2] = (three_chord_cps[1] + half_point) * 0.5;
-		left_segment[3] = half_point;
-
-		right_segment[0] = three_chord_cps[3];
-		right_segment[1] = (three_chord_cps[2] + three_chord_cps[3]) * 0.5;
-		right_segment[2] = (three_chord_cps[2] + half_point) * 0.5;
-		right_segment[3] = half_point;
+		half_point = 0.5 * (three_chord_cps[1] + three_chord_cps[2]);
 	}
 
-	BezierCurve* generateCurve(SmoothingViewer::ConstructionMode curve_mode);
+	MyViewer::MyTraits::Point translatePointBy(float rate, MyViewer::MyTraits::Point p1, MyViewer::MyTraits::Point p2);
+
+	BezierCurve* buildCurve(SmoothingViewer::ConstructionMode curve_mode);
 
 	MyViewer::MyTraits::Point getThreeChordCp(int index);
 	MyViewer::MyTraits::Point getHalfPoint();

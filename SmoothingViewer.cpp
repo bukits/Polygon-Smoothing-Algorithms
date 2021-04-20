@@ -5,20 +5,21 @@
 #include "Line.h"
 
 SmoothingViewer::SmoothingViewer(QWidget* parent) : MyViewer(parent),
-	show_barycenter_points(false), 
-	show_xconstruction_points(false), 
-	show_edges(false), 
-	show_x(false), 
-	show_bounding_net(false),
-    show_v_patches_controlnet(false),
-    show_e_patches_controlnet(false),
-    show_f_patches_controlnet(false),
-    show_bezier_structure(false),
-    show_three_chord_structure(false),
-    show_original_face(false),
-    show_best_face(false),
-    show_control_wireframe(false),
-    show_offset_lines(false)
+        show_barycenter_points(false),
+        show_xconstruction_points(false),
+        show_edges(false),
+        show_x(false),
+        show_bounding_net(false),
+        show_v_patches_controlnet(false),
+        show_e_patches_controlnet(false),
+        show_f_patches_controlnet(false),
+        show_bezier_structure(false),
+        show_three_chord_structure(false),
+        show_original_face(false),
+        show_best_face(false),
+        show_control_wireframe(false),
+        show_offset_lines(false),
+        show_smoothed_mesh(false)
 {}
 
 void::SmoothingViewer::setUpConstruction(ConstructionMode construction_mode, ConstructionMode curve_mode, double alpha) {
@@ -55,6 +56,7 @@ bool SmoothingViewer::openMesh(const std::string& filename, bool update_view) {
     clearViewer();
     bool success = __super::openMesh(filename, update_view);
     control_mesh = mesh;
+    this->show_colored_patches = false;
     used_construction = new ConstructionGenerator(mesh);
     return success;
 }
@@ -211,9 +213,10 @@ void SmoothingViewer::generateSmoothedMesh(ConstructionMode curve_mode, size_t r
     mesh.clean();
     auto generated_bezier_surfaces = used_construction->generateBezierSurfacesFromPatces(curve_mode);
     for (auto bezier : generated_bezier_surfaces) {
-        bezier->generateSurface(resolution);
+        bezier->generateSurface(resolution, mesh);
     }
     show_colored_patches = true;
+    this->updateMesh();
     this->update();
 }
 
@@ -436,6 +439,14 @@ void SmoothingViewer::showOffsetLines() {
     show_offset_lines = !show_offset_lines;
 }
 
+void SmoothingViewer::showColoredPatches() {
+    show_colored_patches = !show_colored_patches;
+}
+
+void SmoothingViewer::showSmoothedMesh() {
+    show_smoothed_mesh = !show_smoothed_mesh;
+}
+
 bool SmoothingViewer::getBaryCState() {
     return show_barycenter_points;
 }
@@ -490,4 +501,8 @@ bool SmoothingViewer::getControlWireFrameState() {
 
 bool SmoothingViewer::getOffsetLinesState() {
     return show_offset_lines;
+}
+
+bool SmoothingViewer::getColoredPatchesState() {
+    return show_colored_patches;
 }

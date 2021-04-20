@@ -85,11 +85,10 @@ void MyWindow::createDockWindow() {
     QVBoxLayout *vContainer = new QVBoxLayout;
     QVBoxLayout* viewBox = new QVBoxLayout;
     auto* rbSmoothed = new QRadioButton("Show smoothed mesh");
-    auto* rbColored = new QRadioButton("Show colored mesh");
+    rbColored = new QRadioButton("Show colored mesh");
 
     auto cbWireFrame = new QCheckBox("Show wire frame of control mesh");
     cbWireFrame->setChecked(viewer->getControlWireFrameState());
-
     connect(cbWireFrame, SIGNAL(clicked(bool)), this, SLOT(showWireFrame()));
 
     connect(rbSmoothed, SIGNAL(clicked(bool)), this, SLOT(showSmoothedMesh()));
@@ -401,6 +400,7 @@ void MyWindow::endComputation() {
 
 void MyWindow::quadraticBlending() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::QUADRATIC, SmoothingViewer::ConstructionMode::QUADRATIC);
+    rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
     view->setEnabled(true);
@@ -409,7 +409,7 @@ void MyWindow::quadraticBlending() {
 
 void MyWindow::cubicBlending() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::CUBIC, SmoothingViewer::ConstructionMode::CUBIC, alphaBlending->value());
-    viewer->update();
+    rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
     view->setEnabled(true);
@@ -418,7 +418,7 @@ void MyWindow::cubicBlending() {
 
 void MyWindow::smoothing() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::SMOOTHING, SmoothingViewer::ConstructionMode::QUADRATIC);
-    viewer->update();
+    rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
     view->setEnabled(true);
@@ -499,6 +499,18 @@ void MyWindow::showOffsetLines() {
 
 void MyWindow::showWireFrame() {
     viewer->showControlWireFrame();
+    viewer->update();
+}
+
+void MyWindow::showColoredMesh() {
+    viewer->showColoredPatches();
+    viewer->showSmoothedMesh();
+    viewer->update();
+}
+
+void MyWindow::showSmoothedMesh() {
+    viewer->showSmoothedMesh();
+    viewer->showColoredPatches();
     viewer->update();
 }
 

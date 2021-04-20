@@ -45,6 +45,8 @@ private slots:
 	void showBestFace();
 	void showOriginalFace();
 	void showWireFrame();
+	void showColoredMesh();
+	void showSmoothedMesh();
 
 private:
   QApplication *parent;
@@ -59,4 +61,5 @@ private:
   QGroupBox* projection;
   QGroupBox* view;
   QDoubleSpinBox* alphaBlending;
+  QRadioButton* rbColored;
 };
