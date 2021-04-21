@@ -170,8 +170,8 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 			auto q_i = 0.25 * (left_curve->getBezierCps(0) + left_curve->getBezierCps(1) + right_curve->getBezierCps(2) + t_bezier);
 			auto q_next = 0.25 * (left_curve->getBezierCps(1) + left_curve->getBezierCps(2) + t_next_bezier + t_bezier);
 			auto q_back = 0.25 * (right_curve->getBezierCps(1) + right_curve->getBezierCps(2) + t_back_bezier + t_bezier);
-			p21 = bezierToThreeChord(q_i, q_next, p31);
-			p12 = bezierToThreeChord(q_i, q_back, p13);
+			p21 = bezierToThreeChord(q_i, q_next, left_curve->getHalfPoint());
+			p12 = bezierToThreeChord(q_i, q_back, right_curve->getHalfPoint());
 		}
 		if (mode == SmoothingViewer::ConstructionMode::QUADRATIC) {
 			p12 = 0.25 * (t_after_projection + right_curve->getThreeChordCp(2) + w_back + right_curve->getHalfPoint());

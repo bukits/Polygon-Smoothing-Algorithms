@@ -1,9 +1,7 @@
 #include "BezierSurface.h"
 
-void BezierSurface::generateSurface(size_t resolution, MyViewer::PolyMesh& mesh) {
+void BezierSurface::generateSurface(size_t resolution, std::vector<MyViewer::MyTraits::Point>& stl_vertices) {
     std::vector<MyViewer::MyTraits::Point> tri;
-
-    std::vector<MyViewer::PolyMesh::VertexHandle> handles_mesh, tri_mesh;
 
     size_t n = degree[0], m = degree[1];
 
@@ -21,7 +19,6 @@ void BezierSurface::generateSurface(size_t resolution, MyViewer::PolyMesh& mesh)
                 }
             }
             handles.push_back(MyViewer::Vector(static_cast<double*>(p)));
-            handles_mesh.push_back(mesh.add_vertex(MyViewer::Vector(static_cast<double*>(p))));
         }
     }
     for (size_t i = 0; i < resolution - 1; ++i)
@@ -32,11 +29,9 @@ void BezierSurface::generateSurface(size_t resolution, MyViewer::PolyMesh& mesh)
             tri.push_back(handles[(i + 1) * resolution + j]);
             face_points.push_back(tri);
 
-            tri_mesh.clear();
-            tri_mesh.push_back(handles_mesh[i * resolution + j]);
-            tri_mesh.push_back(handles_mesh[i * resolution + j + 1]);
-            tri_mesh.push_back(handles_mesh[(i + 1) * resolution + j]);
-            mesh.add_face(tri_mesh);
+            stl_vertices.push_back(handles[i * resolution + j]);
+            stl_vertices.push_back(handles[i * resolution + j + 1]);
+            stl_vertices.push_back(handles[(i + 1) * resolution + j]);
             
             tri.clear();
             tri.push_back(handles[(i + 1) * resolution + j]);
@@ -44,11 +39,9 @@ void BezierSurface::generateSurface(size_t resolution, MyViewer::PolyMesh& mesh)
             tri.push_back(handles[(i + 1) * resolution + j + 1]);
             face_points.push_back(tri);
 
-            tri_mesh.clear();
-            tri_mesh.push_back(handles_mesh[(i + 1) * resolution + j]);
-            tri_mesh.push_back(handles_mesh[i * resolution + j + 1]);
-            tri_mesh.push_back(handles_mesh[(i + 1) * resolution + j + 1]);
-            mesh.add_face(tri_mesh);
+            stl_vertices.push_back(handles[(i + 1) * resolution + j]);
+            stl_vertices.push_back(handles[i * resolution + j + 1]);
+            stl_vertices.push_back(handles[(i + 1) * resolution + j + 1]);
         }
 }
 

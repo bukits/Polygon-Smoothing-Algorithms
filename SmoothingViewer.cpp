@@ -3,6 +3,7 @@
 #include "ThreeChordSegment.h"
 #include "Patch.h"
 #include "Line.h"
+#include "STLProcessor.h"
 
 SmoothingViewer::SmoothingViewer(QWidget* parent) : MyViewer(parent),
         show_barycenter_points(false),
@@ -210,8 +211,12 @@ void SmoothingViewer::draw() {
 }
 
 void SmoothingViewer::generateSmoothedMesh(ConstructionMode curve_mode, size_t resolution) {
+    STLProcessor* stl = new STLProcessor;
+    std::vector<SmoothingViewer::MyTraits::Point> smoothed_mesh_vertices;
     mesh.clean();
-    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, mesh);   
+    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, smoothed_mesh_vertices);   
+    stl->writeSTL(smoothed_mesh_vertices);
+    stl->readSTL(mesh);
     show_colored_patches = true;
     this->updateMesh();
     this->update();

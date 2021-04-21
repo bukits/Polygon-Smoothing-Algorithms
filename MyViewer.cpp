@@ -347,8 +347,8 @@ void MyViewer::updateVertexNormals() {
 
 void MyViewer::updateMesh(bool update_mean_range) {
     if (model_type == ModelType::BEZIER_SURFACE) {
-        mesh.clean();
-        opened_bezier->generateSurface(20, mesh);
+       /* mesh.clean();
+        opened_bezier->generateSurface(20, mesh);*/
     }
   mesh.request_face_normals(); mesh.request_vertex_normals();
   mesh.update_face_normals();

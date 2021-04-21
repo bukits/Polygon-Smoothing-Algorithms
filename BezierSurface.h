@@ -13,7 +13,7 @@ public:
 		degree[1] = m;
 	}
 
-	void generateSurface(size_t resolution, MyViewer::PolyMesh& mesh);	
+	void generateSurface(size_t resolution, std::vector<MyViewer::MyTraits::Point>&);
 	size_t* getDegree();
 	void colorSurface(Vec color);
 	void colorSurfaceNames();

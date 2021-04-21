@@ -38,7 +38,7 @@ public:
 	}
 
 	void setNeighbour(XObject* x);
-	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, MyViewer::PolyMesh& mesh) = 0;
+	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, std::vector<MyViewer::MyTraits::Point>&) = 0;
 	virtual std::vector<ThreeChordSegment*> setUpBoundingCurves() = 0;
 	void drawControlNet(bool isBezier, bool isThreeChord) const;
 	void drawOriginalFace();

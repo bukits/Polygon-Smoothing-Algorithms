@@ -14,7 +14,7 @@ public:
 	SmoothingViewer(QWidget* parent);
 
 	enum class ConstructionMode { QUADRATIC, CUBIC, SMOOTHING };
-	static const size_t resolution_surface = 30;
+	static const size_t resolution_surface = 12;
 	static const size_t resolution_curve = 30;
 
 	void showBaryC();
