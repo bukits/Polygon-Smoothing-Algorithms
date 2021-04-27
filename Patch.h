@@ -36,7 +36,10 @@ public:
 		this->color_control_net = color_control_net;
 		this->color_patch = color_patch;
 	}
-
+	void reverseNeighbour();
+	std::vector<XObject*> getNeighbours();
+	bool containsNeighbour(XObject*);
+	bool isNext(XObject* x_1, XObject* x_2);
 	void setNeighbour(XObject* x);
 	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, std::vector<MyViewer::MyTraits::Point>&) = 0;
 	virtual std::vector<ThreeChordSegment*> setUpBoundingCurves() = 0;

@@ -70,3 +70,11 @@ void BezierSurface::colorSurfaceNames() {
 size_t* BezierSurface::getDegree() {
 	return degree;
 }
+
+//OpenMesh::Vec3d BezierSurface::calculateNormal() {
+//    //return (control_points.at(0) - control_points.at(1)).cross(control_points.at(0) - control_points.at(1));
+//}
+
+void BezierSurface::setOrientation() {
+
+}

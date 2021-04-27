@@ -1,4 +1,4 @@
-#include "SmoothingViewer.h"
+﻿#include "SmoothingViewer.h"
 #include "ConstructionGenerator.h"
 #include "ThreeChordSegment.h"
 #include "Patch.h"
@@ -38,8 +38,33 @@ void::SmoothingViewer::setUpConstruction(ConstructionMode construction_mode, Con
     copy(ep_container.begin(), ep_container.end(), back_inserter(e_patches));
     copy(fp_container.begin(), fp_container.end(), back_inserter(f_patches));
 
+    for (auto vertex_patch : vp_container) if (vertex_patch->getNeighbours().size() == 4) vertex_patch->reverseNeighbour();
+    for (auto face_patch : fp_container) if (face_patch->getNeighbours().size() != 4) face_patch->reverseNeighbour();
+    for (auto face_patch : fp_container) {
+        auto face_patch_neighbours = face_patch->getNeighbours();
+        XObject* patch_next_x;
+        for (size_t i = 0; i < face_patch_neighbours.size(); ++i) {
+            auto patch_x = face_patch_neighbours.at(i);
+            if (i == face_patch_neighbours.size() - 1) patch_next_x = face_patch_neighbours.at(0);
+            else patch_next_x = face_patch_neighbours.at(i + 1);
+            setOrientationDir(ep_container, patch_x, patch_next_x, face_patch);
+        }
+    }
+
     generateBoundigNet(curve_mode);
     generateSmoothedMesh(curve_mode);
+}
+
+void SmoothingViewer::setOrientationDir(std::vector<Patch*>& not_oriented_patches, XObject* actual_x, XObject* next_x, Patch* face) {
+    for (auto not_oriented_patch : not_oriented_patches) {
+        if (not_oriented_patch->containsNeighbour(actual_x) &&
+            not_oriented_patch->containsNeighbour(next_x)) {
+            if (not_oriented_patch->isNext(actual_x, next_x) && face->getNeighbours().size() == 4) {
+                not_oriented_patch->reverseNeighbour();
+                break;
+            }
+        }
+    }
 }
 
 void SmoothingViewer::clearViewer() {
@@ -214,7 +239,7 @@ void SmoothingViewer::generateSmoothedMesh(ConstructionMode curve_mode, size_t r
     STLProcessor* stl = new STLProcessor;
     std::vector<SmoothingViewer::MyTraits::Point> smoothed_mesh_vertices;
     mesh.clean();
-    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, smoothed_mesh_vertices);   
+    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, smoothed_mesh_vertices);
     stl->writeSTL(smoothed_mesh_vertices);
     stl->readSTL(mesh);
     show_colored_patches = true;

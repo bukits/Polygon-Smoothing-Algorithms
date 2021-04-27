@@ -140,8 +140,8 @@ void MyWindow::createDockWindow() {
     auto* text_alpha = new QLabel(tr("Alpha:"));
 
     alphaBlending = new QDoubleSpinBox;
-    alphaBlending->setDecimals(2);
-    alphaBlending->setRange(0.1, 0.6);
+    alphaBlending->setDecimals(3);
+    alphaBlending->setRange(0.0, 0.6);
     alphaBlending->setSingleStep(0.1);
     alphaBlending->setValue(0.1);
 
@@ -488,8 +488,10 @@ void MyWindow::showBestFace() {
 }
 
 void MyWindow::alphaChanged() {
-    viewer->setUpConstruction(SmoothingViewer::ConstructionMode::CUBIC, SmoothingViewer::ConstructionMode::CUBIC, alphaBlending->value());
-    viewer->update();
+    if (alphaBlending->value() > 0.0f) {
+        viewer->setUpConstruction(SmoothingViewer::ConstructionMode::CUBIC, SmoothingViewer::ConstructionMode::CUBIC, alphaBlending->value());
+        viewer->update();
+    }
 }
 
 void MyWindow::showOffsetLines() {

@@ -21,7 +21,7 @@ void STLProcessor::STLFacetOut(std::ofstream& stlout, std::vector<MyViewer::MyTr
 }
 
 void STLProcessor::writeSTL(std::vector<MyViewer::MyTraits::Point>& bezier_vertices) {
-	for (const auto& vertice : bezier_vertices) vertices.push_back(vertice);
+	vertices = bezier_vertices;
 	std::ofstream stlout(stl_file, std::ofstream::trunc);
 	STLExport(stlout);
 	stlout.close();

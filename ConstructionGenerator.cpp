@@ -96,6 +96,7 @@ XObject* ConstructionGenerator::createX(ConstructionGenerator::XElements element
 	xObject->u_opp = elements.u_opp;
 	xObject->v_opp = elements.v_opp;
 	xObject->twist_opp = elements.twist_opp;
+	xObject->normal = elements.normal;
 
 	xObject->ePoint_tangent.insert({ elements.originalE_1, elements.u });
 	xObject->ePoint_tangent.insert({ elements.originalE_2, elements.v });
@@ -137,6 +138,7 @@ XObject* ConstructionGenerator::useQuadraticBlending(ConstructionGenerator::Face
 	elements.twist_opp = twist_opp; elements.u_opp = u_opp, elements.v_opp = v_opp;
 	elements.h_1 = h_1; elements.h_2 = h_2; elements.originalE_1 = faceInfo.originalE_1; elements.originalE_2 = faceInfo.originalE_2;
 	elements.twist_1 = twist_1; elements.twist_2 = twist_2;
+	elements.normal = (faceInfo.newE_1 - faceInfo.newP).cross(faceInfo.newE_2 - faceInfo.newP).normalize();
 
 	return createX(elements, faceInfo);
 }
@@ -196,6 +198,7 @@ XObject* ConstructionGenerator::useCubicBlending(FaceInfo faceInfo, float alpha)
 	elements.twist_opp = twist_opp; elements.u_opp = u_opp, elements.v_opp = v_opp;
 	elements.h_1 = h_1; elements.h_2 = h_2; elements.originalE_1 = faceInfo.originalE_1; elements.originalE_2 = faceInfo.originalE_2;
 	elements.twist_1 = twist_1; elements.twist_2 = twist_2;
+	elements.normal = (faceInfo.newE_1 - faceInfo.newP).cross(faceInfo.newE_2 - faceInfo.newP).normalize();
 
 	return createX(elements, faceInfo);
 }
@@ -267,7 +270,7 @@ std::vector<Patch*> ConstructionGenerator::generateVPatches(const std::vector<XO
 			}
 		}
 		if (neighbours.size() >= 3) {
-			Patch* patch = new VPatch(vertex_control_color, vertex_patch_color);
+			VPatch* patch = new VPatch(vertex_control_color, vertex_patch_color);
 			for (auto x_neighbour : neighbours)
 				patch->setNeighbour(x_neighbour);
 			v_patches.push_back(patch);
@@ -293,7 +296,7 @@ std::vector<Patch*> ConstructionGenerator::generateEPatches(const std::vector<XO
 			}
 		}
 		if (neighbours.size() == 4) {
-			Patch* patch = new EPatch(edge_control_color, edge_patch_color);
+			EPatch* patch = new EPatch(edge_control_color, edge_patch_color);
 			auto x1 = neighbours.at(0);
 			auto x2 = neighbours.at(1);
 			patch->setNeighbour(x1);
@@ -322,7 +325,7 @@ std::vector<Patch*> ConstructionGenerator::generateEPatches(const std::vector<XO
 }
 
 std::vector<Patch*> ConstructionGenerator::generateFPatches(const std::vector<XObject*>& xObjects) {
-	Patch* patch;
+	FPatch* patch;
 	std::vector<Patch*> f_patches;
 	for (const auto& central_point : central_points) {
 		patch = new FPatch(face_control_color, face_patch_color);

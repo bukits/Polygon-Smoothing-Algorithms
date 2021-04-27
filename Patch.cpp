@@ -18,6 +18,8 @@ BezierSurface* Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
 	three_chord_patches.push_back(three_chord_patch);
 	auto bezier = three_chord_patch->generatePatch(mode);
 	bezier_patches.push_back(bezier);
+	for (auto x : x_neighbours)
+		x->connected_beziers.push_back(bezier);
 	return bezier;
 }
 
@@ -71,6 +73,31 @@ MyViewer::MyTraits::Point Patch::bezierToThreeChord(MyViewer::MyTraits::Point q1
 	auto half = 0.5 * (q1 + q2);
 	auto p = p0 + translatePointBy(0.75, half, p0);
 	return p;
+}
+
+void Patch::reverseNeighbour() {
+	std::reverse(x_neighbours.begin(), x_neighbours.end());
+}
+
+bool Patch::containsNeighbour(XObject* xObj) {
+	for (auto x : x_neighbours)
+		if (xObj->x == x->x)
+			return true;
+	return false;
+}
+
+bool Patch::isNext(XObject* x_1, XObject* x_2) {
+	size_t n_1, n_2 = 0;
+	for (size_t i = 0; i < x_neighbours.size(); ++i) {
+		if (x_neighbours.at(i)->x == x_1->x) n_1 = i;
+		if (x_neighbours.at(i)->x == x_2->x) n_2 = i;
+	}
+
+	return n_2 > n_1 || (n_2 == 0 && n_1 == x_neighbours.size() - 1);
+}
+
+std::vector<XObject*> Patch::getNeighbours() {
+	return x_neighbours;
 }
 
 void Patch::caculateInternalBezier(OpenMesh::Vec3f normal) {
@@ -185,7 +212,9 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 		three_chord_patch->setControlPoint(3, 1, p31);
 
 		three_chord_patches.push_back(three_chord_patch);
-		bezier_patches.push_back(three_chord_patch->generatePatch(mode));
+		auto bezier_surface = three_chord_patch->generatePatch(mode);
+		x->connected_beziers.push_back(bezier_surface);
+		bezier_patches.push_back(bezier_surface);
 	}
 	return bezier_patches;
 }

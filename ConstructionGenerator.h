@@ -51,6 +51,7 @@ private:
 
 	struct XElements {
 		MyViewer::MyTraits::Point x, u, v, twist, twist_opp, u_opp, v_opp, h_1, h_2, originalE_1, originalE_2, twist_1, twist_2;
+		OpenMesh::Vec3d normal;
 	};
 
 	XObject* createX(XElements elements, FaceInfo info);

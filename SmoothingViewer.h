@@ -14,7 +14,7 @@ public:
 	SmoothingViewer(QWidget* parent);
 
 	enum class ConstructionMode { QUADRATIC, CUBIC, SMOOTHING };
-	static const size_t resolution_surface = 12;
+	static const size_t resolution_surface = 8;
 	static const size_t resolution_curve = 30;
 
 	void showBaryC();
@@ -93,4 +93,6 @@ private:
 	void generateBoundigNet(ConstructionMode curve_mode, size_t resolution = resolution_curve);
 	void generateSmoothedMesh(ConstructionMode curve_mode, size_t resolution = resolution_surface);
 	void clearViewer();
+	void setOrientationDir(std::vector<Patch*>& not_oriented_patches, XObject* actual_x, XObject* next_x,
+		Patch* face);
 };
