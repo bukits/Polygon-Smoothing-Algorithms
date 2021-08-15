@@ -60,7 +60,7 @@ void ThreeChordPatch::drawWithNames() {
 }
 
 void ThreeChordPatch::drawControlNet() {
-	auto color = Vec(0.0, 1.0, 0.5);
+	auto color = Vec(0.0, 1.0, 0.9);
 	glLineWidth(3.0);
 	glColor3d(
 		color.x,

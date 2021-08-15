@@ -94,7 +94,21 @@ void MyWindow::createDockWindow() {
     connect(rbSmoothed, SIGNAL(clicked(bool)), this, SLOT(showSmoothedMesh()));
     connect(rbColored, SIGNAL(clicked(bool)), this, SLOT(showColoredMesh()));
 
+
+    auto* text_resolution = new QLabel(tr("Resolution:"));
+    resolution = new QSpinBox;
+    resolution->setRange(6, 30);
+    resolution->setSingleStep(2);
+    resolution->setValue(SmoothingViewer::resolution_surface);
+
+    QHBoxLayout* resolution_conatiner = new QHBoxLayout;
+    resolution_conatiner->addWidget(text_resolution);
+    resolution_conatiner->addWidget(resolution);
+
+    connect(resolution, SIGNAL(valueChanged(int)), this, SLOT(resolutionChanged()));
+
     viewBox->addWidget(rbSmoothed);
+    viewBox->addLayout(resolution_conatiner);
     viewBox->addWidget(rbColored);
     viewBox->addWidget(cbWireFrame);
     view->setLayout(viewBox);
@@ -137,6 +151,8 @@ void MyWindow::createDockWindow() {
     cbOffsetLines->setChecked(viewer->getOffsetLinesState());
     connect(cbOffsetLines, SIGNAL(clicked(bool)), this, SLOT(showOffsetLines()));
 
+    QHBoxLayout* alpha_conatiner = new QHBoxLayout;
+
     auto* text_alpha = new QLabel(tr("Alpha:"));
 
     alphaBlending = new QDoubleSpinBox;
@@ -144,6 +160,9 @@ void MyWindow::createDockWindow() {
     alphaBlending->setRange(0.0, 0.6);
     alphaBlending->setSingleStep(0.1);
     alphaBlending->setValue(0.1);
+
+    alpha_conatiner->addWidget(text_alpha);
+    alpha_conatiner->addWidget(alphaBlending);
 
     connect(alphaBlending, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged()));
 
@@ -154,8 +173,7 @@ void MyWindow::createDockWindow() {
     vbox2->addWidget(rbQuadratic);
     vbox2->addWidget(rbCubic);
     vbox2->addWidget(cbOffsetLines);
-    vbox2->addWidget(text_alpha);
-    vbox2->addWidget(alphaBlending);
+    vbox2->addLayout(alpha_conatiner);
     vbox2->addWidget(rbSmoothing);
     algos->setLayout(vbox2);
     vContainer->addWidget(algos);
@@ -400,6 +418,7 @@ void MyWindow::endComputation() {
 
 void MyWindow::quadraticBlending() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::QUADRATIC, SmoothingViewer::ConstructionMode::QUADRATIC);
+    curve_mode = SmoothingViewer::ConstructionMode::QUADRATIC;
     rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
@@ -409,6 +428,7 @@ void MyWindow::quadraticBlending() {
 
 void MyWindow::cubicBlending() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::CUBIC, SmoothingViewer::ConstructionMode::CUBIC, alphaBlending->value());
+    curve_mode = SmoothingViewer::ConstructionMode::CUBIC;
     rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
@@ -418,6 +438,7 @@ void MyWindow::cubicBlending() {
 
 void MyWindow::smoothing() {
     viewer->setUpConstruction(SmoothingViewer::ConstructionMode::SMOOTHING, SmoothingViewer::ConstructionMode::QUADRATIC);
+    curve_mode = SmoothingViewer::ConstructionMode::QUADRATIC;
     rbColored->setChecked(viewer->getColoredPatchesState());
     control_structure->setEnabled(true);
     projection->setEnabled(true);
@@ -467,13 +488,17 @@ void MyWindow::showFPatches() {
 
 void MyWindow::showBezierStructure() {
     viewer->showBezierStrucure();
-    control_points->setEnabled(true);
+    if (!viewer->getBezierStructureState() && !viewer->getThreeChorStructureState())
+        control_points->setEnabled(false);
+    else control_points->setEnabled(true);
     viewer->update();
 }
 
 void MyWindow::showThreeChordStructure() {
     viewer->showThreeChordStructure();
-    control_points->setEnabled(true);
+    if (!viewer->getBezierStructureState() && !viewer->getThreeChorStructureState())
+        control_points->setEnabled(false);
+    else control_points->setEnabled(true);
     viewer->update();
 }
 
@@ -488,10 +513,13 @@ void MyWindow::showBestFace() {
 }
 
 void MyWindow::alphaChanged() {
-    if (alphaBlending->value() > 0.0f) {
+    if (alphaBlending->value() > 0.0f) 
         viewer->setUpConstruction(SmoothingViewer::ConstructionMode::CUBIC, SmoothingViewer::ConstructionMode::CUBIC, alphaBlending->value());
-        viewer->update();
-    }
+}
+
+void MyWindow::resolutionChanged() {
+    if (resolution->value() >= 4) 
+        viewer->generateSmoothedMesh(resolution->value());
 }
 
 void MyWindow::showOffsetLines() {
@@ -505,14 +533,18 @@ void MyWindow::showWireFrame() {
 }
 
 void MyWindow::showColoredMesh() {
-    viewer->showColoredPatches();
-    viewer->showSmoothedMesh();
+    if (!viewer->getColoredPatchesState()) {
+        viewer->showColoredPatches();
+        viewer->showSmoothedMesh();
+    }
     viewer->update();
 }
 
 void MyWindow::showSmoothedMesh() {
-    viewer->showSmoothedMesh();
-    viewer->showColoredPatches();
+    if (!viewer->getSmoothedMeshState()) {
+        viewer->showSmoothedMesh();
+        viewer->showColoredPatches();
+    }
     viewer->update();
 }
 

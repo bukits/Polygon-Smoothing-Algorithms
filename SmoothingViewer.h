@@ -14,7 +14,7 @@ public:
 	SmoothingViewer(QWidget* parent);
 
 	enum class ConstructionMode { QUADRATIC, CUBIC, SMOOTHING };
-	static const size_t resolution_surface = 8;
+	static const size_t resolution_surface = 6;
 	static const size_t resolution_curve = 30;
 
 	void showBaryC();
@@ -49,9 +49,12 @@ public:
 	bool getControlWireFrameState();
 	bool getOffsetLinesState();
 	bool getColoredPatchesState();
+	bool getSmoothedMeshState();
 
 	bool openMesh(const std::string& filename, bool update_view = true) override;
 	void setUpConstruction(ConstructionMode construction_mode, ConstructionMode curve_mode, double alpha = 0.1);
+	void generateSmoothedMesh(size_t resolution = resolution_surface);
+	void setUpBezierSurfaces(ConstructionMode curve_mode);
 
 protected:
 	void draw() override;
@@ -86,12 +89,10 @@ private:
 		show_original_face,
 		show_best_face,
 		show_control_wireframe,
-		show_offset_lines,
-		show_smoothed_mesh;
+		show_offset_lines;
 
 	void drawBoundingNet() const;
 	void generateBoundigNet(ConstructionMode curve_mode, size_t resolution = resolution_curve);
-	void generateSmoothedMesh(ConstructionMode curve_mode, size_t resolution = resolution_surface);
 	void clearViewer();
 	void setOrientationDir(std::vector<Patch*>& not_oriented_patches, XObject* actual_x, XObject* next_x,
 		Patch* face);

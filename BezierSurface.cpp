@@ -2,6 +2,8 @@
 
 void BezierSurface::generateSurface(size_t resolution, std::vector<MyViewer::MyTraits::Point>& stl_vertices) {
     std::vector<MyViewer::MyTraits::Point> tri;
+    face_points.clear();
+    handles.clear();
 
     size_t n = degree[0], m = degree[1];
 
@@ -69,12 +71,4 @@ void BezierSurface::colorSurfaceNames() {
 
 size_t* BezierSurface::getDegree() {
 	return degree;
-}
-
-//OpenMesh::Vec3d BezierSurface::calculateNormal() {
-//    //return (control_points.at(0) - control_points.at(1)).cross(control_points.at(0) - control_points.at(1));
-//}
-
-void BezierSurface::setOrientation() {
-
 }

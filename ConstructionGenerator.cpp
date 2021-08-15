@@ -96,7 +96,6 @@ XObject* ConstructionGenerator::createX(ConstructionGenerator::XElements element
 	xObject->u_opp = elements.u_opp;
 	xObject->v_opp = elements.v_opp;
 	xObject->twist_opp = elements.twist_opp;
-	xObject->normal = elements.normal;
 
 	xObject->ePoint_tangent.insert({ elements.originalE_1, elements.u });
 	xObject->ePoint_tangent.insert({ elements.originalE_2, elements.v });
@@ -138,7 +137,6 @@ XObject* ConstructionGenerator::useQuadraticBlending(ConstructionGenerator::Face
 	elements.twist_opp = twist_opp; elements.u_opp = u_opp, elements.v_opp = v_opp;
 	elements.h_1 = h_1; elements.h_2 = h_2; elements.originalE_1 = faceInfo.originalE_1; elements.originalE_2 = faceInfo.originalE_2;
 	elements.twist_1 = twist_1; elements.twist_2 = twist_2;
-	elements.normal = (faceInfo.newE_1 - faceInfo.newP).cross(faceInfo.newE_2 - faceInfo.newP).normalize();
 
 	return createX(elements, faceInfo);
 }
@@ -198,7 +196,6 @@ XObject* ConstructionGenerator::useCubicBlending(FaceInfo faceInfo, float alpha)
 	elements.twist_opp = twist_opp; elements.u_opp = u_opp, elements.v_opp = v_opp;
 	elements.h_1 = h_1; elements.h_2 = h_2; elements.originalE_1 = faceInfo.originalE_1; elements.originalE_2 = faceInfo.originalE_2;
 	elements.twist_1 = twist_1; elements.twist_2 = twist_2;
-	elements.normal = (faceInfo.newE_1 - faceInfo.newP).cross(faceInfo.newE_2 - faceInfo.newP).normalize();
 
 	return createX(elements, faceInfo);
 }
@@ -340,9 +337,14 @@ std::vector<Patch*> ConstructionGenerator::generateFPatches(const std::vector<XO
 	return f_patches;
 }
 
-void ConstructionGenerator::generateBezierSurfacesFromPatces(SmoothingViewer::ConstructionMode mode, size_t resolution, std::vector<MyViewer::MyTraits::Point>& vertices) {
+void ConstructionGenerator::generateBezierSurfacesFromPatces(size_t resolution, std::vector<MyViewer::MyTraits::Point>& vertices) {
 	for (auto patch : patches)
-		patch->setUpBezierSurface(mode, resolution, vertices);
+		patch->generateBezierSurface(resolution, vertices);
+}
+
+void ConstructionGenerator::setUpBezierSurfacesFromPatches(SmoothingViewer::ConstructionMode mode) {
+	for (auto patch : patches)
+		patch->setUpBezierSurface(mode);
 }
 
 std::vector<BezierCurve*> ConstructionGenerator::generateBoundingCurves(SmoothingViewer::ConstructionMode mode) {

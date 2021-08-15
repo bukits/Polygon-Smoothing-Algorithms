@@ -27,8 +27,8 @@ protected:
 	std::vector<MyViewer::MyTraits::Point> internal_points;
 
 	MyViewer::MyTraits::Point findSharedE(XObject* x1, XObject* x2);
-	BezierSurface* build4sidedPatch(SmoothingViewer::ConstructionMode mode);
-	std::vector<BezierSurface*> centralSplit(SmoothingViewer::ConstructionMode mode);
+	void build4sidedPatch(SmoothingViewer::ConstructionMode mode);
+	void centralSplit(SmoothingViewer::ConstructionMode mode);
 	void attachCurveToX(ThreeChordSegment* curve, XObject* x);
 	ThreeChordSegment* searchCommonCurve(XObject* x1, XObject* x2);
 public:
@@ -41,7 +41,8 @@ public:
 	bool containsNeighbour(XObject*);
 	bool isNext(XObject* x_1, XObject* x_2);
 	void setNeighbour(XObject* x);
-	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, std::vector<MyViewer::MyTraits::Point>&) = 0;
+	virtual void setUpBezierSurface(SmoothingViewer::ConstructionMode mode) = 0;
+	virtual void generateBezierSurface(size_t resolution, std::vector<MyViewer::MyTraits::Point>&) = 0;
 	virtual std::vector<ThreeChordSegment*> setUpBoundingCurves() = 0;
 	void drawControlNet(bool isBezier, bool isThreeChord) const;
 	void drawOriginalFace();

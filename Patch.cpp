@@ -3,7 +3,7 @@
 #include "ThreeChordSegment.h"
 #include "ThreeChordPatch.h"
 
-BezierSurface* Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
+void Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
 	ThreeChordPatch* three_chord_patch = new ThreeChordPatch();
 	for (int i = 0; i < 4; ++i) three_chord_patch->setControlPoint(0, i, bounding_curves.at(0)->getThreeChordCp(i));
 	for (int j = 0; j < 4; ++j) three_chord_patch->setControlPoint(j, 3, bounding_curves.at(1)->getThreeChordCp(j));
@@ -18,9 +18,6 @@ BezierSurface* Patch::build4sidedPatch(SmoothingViewer::ConstructionMode mode) {
 	three_chord_patches.push_back(three_chord_patch);
 	auto bezier = three_chord_patch->generatePatch(mode);
 	bezier_patches.push_back(bezier);
-	for (auto x : x_neighbours)
-		x->connected_beziers.push_back(bezier);
-	return bezier;
 }
 
 MyViewer::MyTraits::Point Patch::projectionToPlane(MyViewer::MyTraits::Point twist, OpenMesh::Vec3f face_normal) {
@@ -128,7 +125,7 @@ void Patch::caculateInternalBezier(OpenMesh::Vec3f normal) {
 	}
 }
 
-std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMode mode) {
+void Patch::centralSplit(SmoothingViewer::ConstructionMode mode) {
 	MyViewer::MyTraits::Point pointSum;
 	pointSum[0] = pointSum[1] = pointSum[2] = 0.0;
 	for (const auto& p : internal_points) {
@@ -213,10 +210,8 @@ std::vector<BezierSurface*> Patch::centralSplit(SmoothingViewer::ConstructionMod
 
 		three_chord_patches.push_back(three_chord_patch);
 		auto bezier_surface = three_chord_patch->generatePatch(mode);
-		x->connected_beziers.push_back(bezier_surface);
 		bezier_patches.push_back(bezier_surface);
 	}
-	return bezier_patches;
 }
 
 void Patch::drawLineSplit(std::vector<MyViewer::MyTraits::Point> points, Vec color) {

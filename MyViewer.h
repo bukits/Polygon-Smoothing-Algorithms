@@ -65,7 +65,7 @@ protected:
   PolyMesh mesh;
 
   enum class ModelType { NONE, MESH, BEZIER_SURFACE } model_type;
-  bool show_colored_patches;
+  bool show_colored_patches, show_solid;
 
 private:
   using TriMesh = OpenMesh::TriMesh_ArrayKernelT<MyTraits>;
@@ -100,7 +100,7 @@ private:
 
   // Visualization
   double mean_min, mean_max, cutoff_ratio;
-  bool show_control_points, show_solid, show_wireframe;
+  bool show_control_points, show_wireframe;
   GLuint isophote_texture, environment_texture, current_isophote_texture, slicing_texture;
   Vector slicing_dir;
   enum class Visualization { PLAIN, MEAN, SLICING, ISOPHOTES } visualization;

@@ -17,6 +17,4 @@ public:
 	size_t* getDegree();
 	void colorSurface(Vec color);
 	void colorSurfaceNames();
-	OpenMesh::Vec3d calculateNormal();
-	void setOrientation();
 };

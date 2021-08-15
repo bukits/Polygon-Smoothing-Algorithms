@@ -475,7 +475,7 @@ void MyViewer::draw() {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1, 1);
 
-    if ((show_solid || show_wireframe) && !show_colored_patches) {
+    if (show_solid || show_wireframe) {
         if (visualization == Visualization::PLAIN)
             glColor3d(0.5, 0.5, 0.5);
         else if (visualization == Visualization::ISOPHOTES) {

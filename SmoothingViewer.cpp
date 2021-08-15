@@ -19,8 +19,7 @@ SmoothingViewer::SmoothingViewer(QWidget* parent) : MyViewer(parent),
         show_original_face(false),
         show_best_face(false),
         show_control_wireframe(false),
-        show_offset_lines(false),
-        show_smoothed_mesh(false)
+        show_offset_lines(false)
 {}
 
 void::SmoothingViewer::setUpConstruction(ConstructionMode construction_mode, ConstructionMode curve_mode, double alpha) {
@@ -50,9 +49,12 @@ void::SmoothingViewer::setUpConstruction(ConstructionMode construction_mode, Con
             setOrientationDir(ep_container, patch_x, patch_next_x, face_patch);
         }
     }
+    show_colored_patches = true;
+    show_solid = false;
 
     generateBoundigNet(curve_mode);
-    generateSmoothedMesh(curve_mode);
+    setUpBezierSurfaces(curve_mode);
+    generateSmoothedMesh();
 }
 
 void SmoothingViewer::setOrientationDir(std::vector<Patch*>& not_oriented_patches, XObject* actual_x, XObject* next_x, Patch* face) {
@@ -92,7 +94,7 @@ void SmoothingViewer::draw() {
 
     if (show_barycenter_points) {
         glColor3d(1.0, 0.0, 1.0);
-        glPointSize(5.0);
+        glPointSize(10.0);
         glDisable(GL_LIGHTING);
         glBegin(GL_POINTS);
         for (const auto& p : used_construction->getCentralPoints()) {
@@ -113,7 +115,7 @@ void SmoothingViewer::draw() {
 
     if (show_xconstruction_points) {
         glColor3d(1.0, 0.0, 1.0);
-        glPointSize(5.0);
+        glPointSize(10.0);
         glDisable(GL_LIGHTING);
         glBegin(GL_POINTS);
         for (const auto& xObj : xObjects) {
@@ -235,16 +237,19 @@ void SmoothingViewer::draw() {
     }
 }
 
-void SmoothingViewer::generateSmoothedMesh(ConstructionMode curve_mode, size_t resolution) {
+void SmoothingViewer::generateSmoothedMesh(size_t resolution) {
     STLProcessor* stl = new STLProcessor;
     std::vector<SmoothingViewer::MyTraits::Point> smoothed_mesh_vertices;
     mesh.clean();
-    used_construction->generateBezierSurfacesFromPatces(curve_mode, resolution, smoothed_mesh_vertices);
+    used_construction->generateBezierSurfacesFromPatces(resolution, smoothed_mesh_vertices);
     stl->writeSTL(smoothed_mesh_vertices);
     stl->readSTL(mesh);
-    show_colored_patches = true;
     this->updateMesh();
     this->update();
+}
+
+void SmoothingViewer::setUpBezierSurfaces(ConstructionMode curve_mode) {
+    used_construction->setUpBezierSurfacesFromPatches(curve_mode);
 }
 
 void SmoothingViewer::drawWithNames() {
@@ -471,7 +476,7 @@ void SmoothingViewer::showColoredPatches() {
 }
 
 void SmoothingViewer::showSmoothedMesh() {
-    show_smoothed_mesh = !show_smoothed_mesh;
+    show_solid = !show_solid;
 }
 
 bool SmoothingViewer::getBaryCState() {
@@ -532,4 +537,8 @@ bool SmoothingViewer::getOffsetLinesState() {
 
 bool SmoothingViewer::getColoredPatchesState() {
     return show_colored_patches;
+}
+
+bool SmoothingViewer::getSmoothedMeshState() {
+    return show_solid;
 }

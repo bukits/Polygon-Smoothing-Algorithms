@@ -1,19 +1,23 @@
 #include "FPatch.h"
 #include "ThreeChordSegment.h"
 
-void FPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode, size_t resolution, std::vector<MyViewer::MyTraits::Point>& vertices) {
+void FPatch::setUpBezierSurface(SmoothingViewer::ConstructionMode mode) {
 	for (size_t i = 0; i < x_neighbours.size(); i++) {
 		auto x_i = x_neighbours.at(i);
 		internal_points.push_back(x_i->twist_opp);
 	}
-	if (x_neighbours.size() == 4) {	
-		auto bezier = build4sidedPatch(mode);
+	if (x_neighbours.size() == 4) build4sidedPatch(mode);
+	else centralSplit(mode);
+}
+
+void FPatch::generateBezierSurface(size_t resolution, std::vector<MyViewer::MyTraits::Point>& vertices) {
+
+	if (x_neighbours.size() == 4) {
 		resolution = ((resolution - 1) * 2) + 1;
-		bezier->generateSurface(resolution, vertices);
-	} else {
-		auto beziers = centralSplit(mode);
-		for (auto bezier : beziers) bezier->generateSurface(resolution, vertices);
 	}
+
+	for (auto bezier : bezier_patches)
+		bezier->generateSurface(resolution, vertices);
 }
 
 std::vector<ThreeChordSegment*> FPatch::setUpBoundingCurves() {

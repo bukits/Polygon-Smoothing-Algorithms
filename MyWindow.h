@@ -31,6 +31,7 @@ private slots:
 	void createDockWindow();
 	
 	void alphaChanged();
+	void resolutionChanged();
 	void showOffsetLines();
 	void showBaryPoints();
 	void showEdges();
@@ -61,5 +62,8 @@ private:
   QGroupBox* projection;
   QGroupBox* view;
   QDoubleSpinBox* alphaBlending;
+  QSpinBox* resolution;
   QRadioButton* rbColored;
+
+  SmoothingViewer::ConstructionMode curve_mode;
 };
