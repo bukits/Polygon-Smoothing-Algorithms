@@ -1,3 +1,22 @@
+# About
+This repository is about my BSc final thesis project.
+A well-known method in 3D geometric modelling is control polyhedron based design, which
+allows to create complex free-form objects in an indirect way. The most widespread technique is recursive subdivision where we smooth the polyhedron until it becomes visually
+continuous. In the present thesis, the boundary surfaces are produced directly in one step.
+The representation is based on the so-called X-construction, by means of witch smooth,
+composite surfaces can be produced in different ways. Each method produces standard,
+smoothly connected Bézier-surfaces; while providing different types of boundary curves
+and geometric continuities.
+In my thesis I present the so called three-chord segment structure which can handle curves
+with different degrees. I describe the definition of its control points and the necessary algebraic conditions for the smooth connection of adjacent patches (G1 geometric continuity,
+common direction blending).
+To illustrate the above technique, I have developed a 3D test program that produces a
+smoothly connected surface using a given control polyhedron. The user also has the option
+of applying three methods and displaying the geometric features of the constructions. In
+the last section of the thesis, I also illustrate the results of each algorithm by some test
+examples.
+
+
 # Usage
 
 Pressing `h` displays a help window that contains all the necessary information.
